@@ -36,6 +36,7 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN mv .env.sample .env
 RUN cp /usr/bin/tini /usr/local/bin/tini \
     && cp /usr/local/bin/docker-entrypoint.sh /app/
+COPY start.sh .
 
 FROM node:${NODE_V}-slim AS final
 ARG USER=planka
