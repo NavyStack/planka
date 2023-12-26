@@ -1,17 +1,17 @@
 ARG NODE_V=18-bookworm
 
 FROM node:${NODE_V} as builder
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 RUN apt-get update && \
-    apt-get install -y tini && \
-    npm install pnpm --global && \
-    pnpm config set store-dir /root/.pnpm-store
+    apt-get install -y tini
+RUN corepack enable
 
 #FROM builder as server-dependencies
 WORKDIR /planka/server
 
 COPY server/package.json server/pnpm-lock.yaml ./
-RUN --mount=type=cache,id=pnpm-store,target=/root/.pnpm-store \
-    --mount=type=cache,id=node-gyp,target=/root/.cache/node-gyp \
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm install --frozen-lockfile --prod
 COPY server .
 
@@ -19,8 +19,7 @@ COPY server .
 WORKDIR /planka/client
 
 COPY client/package.json client/pnpm-lock.yaml ./
-RUN --mount=type=cache,id=pnpm-store,target=/root/.pnpm-store \
-    --mount=type=cache,id=node-gyp,target=/root/.cache/node-gyp \
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm install --frozen-lockfile --prod
 COPY client .
 
