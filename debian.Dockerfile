@@ -1,6 +1,7 @@
 ARG NODE_V=18-bookworm
 
 FROM node:${NODE_V} as builder
+#FROM node:${NODE_V}-slim as builder
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN apt-get update && \
