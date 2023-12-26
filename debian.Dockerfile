@@ -32,20 +32,18 @@ WORKDIR /app
 COPY --from=builder /planka/server .
 COPY --from=builder /planka/client/build public
 COPY --from=builder /planka/client/build/index.html views/index.ejs
-COPY docker-entrypoint.sh .
+COPY docker-entrypoint.sh /usr/local/bin/
 RUN mv .env.sample .env
+RUN cp /usr/bin/tini /usr/local/bin/tini \
+    && cp /usr/local/bin/docker-entrypoint.sh /app/
 
 FROM node:${NODE_V}-slim AS final
-
 ARG USER=planka
-
 RUN useradd --no-create-home --shell /bin/bash $USER
-
 USER $USER
 
 WORKDIR /app
-
-COPY --from=intermediate --chown=$USER:$USER /usr/bin/tini /usr/local/bin/tini
+COPY --from=intermediate --chown=$USER:$USER /usr/local/bin/tini /usr/local/bin/docker-entrypoint.sh /usr/local/bin/
 COPY --from=intermediate --chown=$USER:$USER /app .
 
 VOLUME /app/public/user-avatars
@@ -58,4 +56,4 @@ EXPOSE 1337/tcp
 # https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md#handling-kernel-signals
 ENTRYPOINT ["tini", "--"]
 
-CMD ["./docker-entrypoint.sh"]
+CMD ["docker-entrypoint.sh"]
