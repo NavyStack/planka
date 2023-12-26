@@ -57,3 +57,6 @@ EXPOSE 1337/tcp
 ENTRYPOINT ["tini", "--"]
 
 CMD ["docker-entrypoint.sh"]
+
+# docker buildx build -f debian.Dockerfile . --target client --tag planka:clinet-latest
+# docker buildx build -f debian.Dockerfile . --target server-dependencies --tag planka:server-latest
